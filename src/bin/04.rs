@@ -1,87 +1,82 @@
-use std::{collections::HashSet, str::FromStr};
+use std::collections::HashSet;
 
 advent_of_code::solution!(4);
 
-struct ScratchPad(u32);
-
-impl FromStr for ScratchPad {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (_, data) = s.split_once(':').unwrap();
-
-        let (target, given) = data.split_once('|').unwrap();
-
-        let target = target
-            .split(' ')
-            .filter_map(|number| number.parse::<u32>().ok())
-            .collect::<HashSet<_>>();
-
-        let total = given
-            .split(' ')
-            .filter_map(|number| number.parse::<u32>().ok())
-            .filter(|number| target.contains(number))
-            .count() as u32;
-
-        Ok(Self(total))
-    }
-}
 
 pub fn part_one(input: &str) -> Option<u32> {
-    Some(
-        input
-            .lines()
-            .map(|line| {
-                let total = line.parse::<ScratchPad>().unwrap().0;
-                if total == 0 {
-                    0
-                } else {
-                    1 << (total - 1)
-                }
-            })
-            .sum::<u32>(),
-    )
-}
-
-struct State {
-    total: u32,
-    copies: u32,
-    interval_end: Vec<u32>,
-}
-
-impl State {
-    fn new() -> Self {
-        Self {
-            total: 0,
-            copies: 1,
-            interval_end: vec![],
+    let mut ans: u32 = 0;
+    for line in input.lines(){
+        let mut it = line.split(':');
+        it.next();
+        let mut cardit = it.next().unwrap().trim().split('|');
+        let mut good = HashSet::new();
+        for n in cardit.next().unwrap().trim().split(' ') {
+            if n.trim().len() == 0{
+                continue;
+            }
+            good.insert(n.trim().parse::<u32>().unwrap());
         }
+        let mut cur = 0;
+        for n in cardit.next().unwrap().trim().split(' ') {
+            if n.trim().len() == 0{
+                continue;
+            }
+            if good.contains(&n.trim().parse::<u32>().unwrap()){
+                if cur == 0{
+                    cur = 1;
+                }
+                else{
+                    cur *= 2;
+                }
+                
+            }
+        }
+        ans += cur;
     }
+    Some(ans)
 }
+
+
 
 pub fn part_two(input: &str) -> Option<u32> {
-    Some(
-        input
-            .lines()
-            .enumerate()
-            .fold(State::new(), |mut state, (i, line)| {
-                let cur = line.parse::<ScratchPad>().unwrap().0 as usize;
-                state.total += state.copies;
+    let n = input.lines().count();
+    let mut cc: Vec<u32> = std::iter::repeat(1).take(n).collect::<Vec<_>>();
 
-                if state.interval_end.len() <= i + cur {
-                    state.interval_end.resize(i + cur + 1, 0);
+    let mut ans: u32 = 0;
+    for (i, line) in input.lines().enumerate(){
+        let mut it = line.split(':');
+        it.next();
+        let mut cardit = it.next().unwrap().trim().split('|');
+        let mut good = HashSet::new();
+        for n in cardit.next().unwrap().trim().split(' ') {
+            if n.trim().len() == 0{
+                continue;
+            }
+            good.insert(n.trim().parse::<u32>().unwrap());
+        }
+        let mut cur = 0;
+        let mut m = 0;
+        for n in cardit.next().unwrap().trim().split(' ') {
+            if n.trim().len() == 0{
+                continue;
+            }
+            if good.contains(&n.trim().parse::<u32>().unwrap()){
+                m += 1;
+                if cur == 0{
+                    cur = 1;
                 }
-
-                if cur > 0 {
-                    state.interval_end[i + cur] += state.copies;
-                    state.copies += state.copies;
+                else{
+                    cur *= 2;
                 }
-                state.copies -= state.interval_end[i];
-
-                state
-            })
-            .total,
-    )
+                
+            }
+        }
+        for j in 0..m{
+            cc[i+j + 1] += cc[i];
+        }
+        ans += cc[i];
+    }
+    Some(ans)
 }
 
 #[cfg(test)]

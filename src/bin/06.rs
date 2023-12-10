@@ -1,52 +1,109 @@
-use itertools::Itertools;
 
 advent_of_code::solution!(6);
 
-fn parse(line: &str) -> impl Iterator<Item = u64> + '_ {
-    let (_, numbers) = line.split_once(':').unwrap();
-    numbers
-        .split_ascii_whitespace()
-        .filter_map(|s| s.parse::<u64>().ok())
-}
-
-fn solve(time: u64, distance: u64) -> u64 {
-    let tf = time as f64;
-    let df = distance as f64;
-
-    let x0 = (tf - (tf * tf - 4.0 * df).sqrt()) / 2.0;
-    let x1 = (tf + (tf * tf - 4.0 * df).sqrt()) / 2.0;
-    let mut x0 = x0.ceil() as u64;
-    let mut x1 = x1.floor() as u64;
-
-    if (time - x0) * x0 <= distance {
-        x0 += 1;
-    }
-
-    if (time - x1) * x1 <= distance {
-        x1 -= 1;
-    }
-
-    x1 - x0 + 1
-}
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let (time, distance) = input.lines().map(parse).next_tuple().unwrap();
+    let mut tt = Vec::new();
+    let mut dis = Vec::new();
+    
+    for line in input.lines(){
+        if line.starts_with("Time"){
+            line.split_whitespace().skip(1).for_each(|x| {tt.push(x.parse::<u32>().unwrap());});
+        }
+        else if line.starts_with("Distance"){
+            line.split_whitespace().skip(1).for_each(|x| {dis.push(x.parse::<u32>().unwrap());});
+        }
+        
+    }
+    
+    let mut ans: u64 = 1;
+    let n = tt.len();
+    
 
-    Some(
-        time.zip(distance)
-            .map(|(t, d)| solve(t, d))
-            .product::<u64>(),
-    )
-}
-
-fn parse_two(line: &str) -> u64 {
-    let (_, numbers) = line.split_once(':').unwrap();
-    numbers.replace(' ', "").parse::<u64>().unwrap()
+    for i in 0..n{
+        let mx = (tt[i] + 1) / 2;
+        if (tt[i] - mx) * mx <= dis[i]{
+            ans = 0;
+            break;
+        }
+        let mut a = 0;
+        let mut b = mx;
+        while a < b{
+            let mid = (a + b) / 2;
+            let s = (tt[i] - mid) * mid;
+            if s > dis[i] {
+                b = mid;
+            }
+            else{
+                a = mid + 1;
+            }
+        }
+        let low = a;
+        a = mx;
+        b = tt[i];
+        while a < b{
+            let mid = (a + b + 1) / 2;
+            let s = (tt[i] - mid) * mid;
+            if s > dis[i] {
+                a = mid;
+            }
+            else{
+                b = mid - 1;
+            }
+        }
+        let high = a;
+        ans *= (high - low + 1) as u64;
+        
+    }
+    Some(ans)
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    let (t, d) = input.lines().map(parse_two).next_tuple().unwrap();
-    Some(solve(t, d))
+    let mut tt = 0;
+    let mut dis = 0;
+    
+    for line in input.lines(){
+        if line.starts_with("Time"){
+            tt = line.split_whitespace().skip(1).collect::<Vec<&str>>().join("").parse::<u64>().unwrap();
+        }
+        else if line.starts_with("Distance"){
+            dis = line.split_whitespace().skip(1).collect::<Vec<&str>>().join("").parse::<u64>().unwrap();
+        }
+        
+    }
+    
+    
+    
+
+    let mx = (tt + 1) / 2;
+    let mut a = 0;
+    let mut b = mx;
+    while a < b{
+        let mid = (a + b) / 2;
+        let s = (tt - mid) * mid;
+        if s > dis {
+            b = mid;
+        }
+        else{
+            a = mid + 1;
+        }
+    }
+    let low = a;
+    a = mx;
+    b = tt;
+    while a < b{
+        let mid = (a + b + 1) / 2;
+        let s = (tt - mid) * mid;
+        if s > dis {
+            a = mid;
+        }
+        else{
+            b = mid - 1;
+        }
+    }
+    let high = a;
+    let ans = (high - low + 1) as u64;
+    Some(ans)
 }
 
 #[cfg(test)]

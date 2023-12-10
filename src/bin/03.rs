@@ -1,95 +1,93 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
-use regex::Regex;
 
 advent_of_code::solution!(3);
 
 pub fn part_one(input: &str) -> Option<u32> {
-    let board = input
-        .split('\n')
-        .filter(|line| !line.is_empty())
-        .collect::<Vec<_>>();
+    let lines: Vec<&str> = input.lines().collect();
+    let (n, m) = (lines.len(), lines[0].len());
 
-    let width = board[0].len();
-    let height = board.len();
-
-    assert!(board.iter().all(|line| line.len() == width));
-
-    let number = Regex::new(r"\d+").unwrap();
-
-    Some(
-        board
-            .iter()
-            .enumerate()
-            .flat_map(|(row, line)| number.find_iter(line).map(move |m| (row, m)))
-            .filter_map(|(row, number)| {
-                let x0 = row.saturating_sub(1);
-                let x1 = std::cmp::min(height, row + 2);
-                let y0 = number.start().saturating_sub(1);
-                let y1 = std::cmp::min(width, number.end() + 1);
-
-                for row in board.iter().take(x1).skip(x0) {
-                    for y in y0..y1 {
-                        let cell = row[y..y + 1].chars().next().unwrap();
-                        if !matches!(cell, '.' | '0'..='9') {
-                            let number = number.as_str().parse::<u32>().unwrap();
-                            return Some(number);
+    let moves = [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, -1), (-1, 1), (1, -1)];
+    let mut ans: u32 = 0;
+    for i in 0..n{
+        let mut j = 0;
+        while j < m {
+            let j0 = j;
+            while j < m && lines[i].as_bytes()[j].is_ascii_digit() {
+                j += 1;
+            }
+            if j > j0 {
+                let mut possible = false;
+                let mut cur:u32 = 0;
+                for j1 in j0..j {
+                    cur = 10 * cur + (lines[i].as_bytes()[j1] - b'0') as u32;
+                    for d in moves{
+                        let (i1, j1) = (i as i32 + d.0, j1 as i32 + d.1);
+                        if i1 >= 0 && i1 < n as i32 && j1 >= 0 && j1 < m as i32 {
+                            let c = lines[i1 as usize].as_bytes()[j1 as usize];
+                            if !c.is_ascii_digit() && c != b'.'{
+                                possible = true;
+                            }
                         }
                     }
                 }
-
-                None
-            })
-            .sum(),
-    )
+                if possible {
+                    ans += cur;
+                }
+            }
+            
+            j += 1;
+        }
+    }
+    Some(ans)
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let board = input
-        .split('\n')
-        .filter(|line| !line.is_empty())
-        .collect::<Vec<_>>();
+    let lines: Vec<&str> = input.lines().collect();
+    let (n, m) = (lines.len(), lines[0].len());
 
-    let width = board[0].len();
-    let height = board.len();
-
-    assert!(board.iter().all(|line| line.len() == width));
-
-    let number = Regex::new(r"\d+").unwrap();
-
-    Some(
-        board
-            .iter()
-            .enumerate()
-            .flat_map(|(row, line)| number.find_iter(line).map(move |m| (row, m)))
-            .fold(HashMap::<_, Vec<_>>::new(), |mut acc, (row, number)| {
-                let x0 = row.saturating_sub(1);
-                let x1 = std::cmp::min(height, row + 2);
-                let y0 = number.start().saturating_sub(1);
-                let y1 = std::cmp::min(width, number.end() + 1);
-
-                for (x, row) in board.iter().enumerate().take(x1).skip(x0) {
-                    for y in y0..y1 {
-                        if &row[y..y + 1] == "*" {
-                            acc.entry((x, y))
-                                .or_default()
-                                .push(number.as_str().parse::<u32>().unwrap());
+    let moves = [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, -1), (-1, 1), (1, -1)];
+    let mut ans: u32 = 0;
+    let mut sol = HashMap::new();
+    for i in 0..n{
+        let mut j = 0;
+        while j < m {
+            let j0 = j;
+            while j < m && lines[i].as_bytes()[j].is_ascii_digit() {
+                j += 1;
+            }
+            if j > j0 {
+                let mut cur:u32 = 0;
+                for j1 in j0..j {
+                    cur = 10 * cur + (lines[i].as_bytes()[j1] - b'0') as u32;
+                }
+                let mut seen = HashSet::new();
+                for j1 in j0..j {
+                    for d in moves{
+                        let (i1, j1) = (i as i32 + d.0, j1 as i32 + d.1);
+                        if i1 >= 0 && i1 < n as i32 && j1 >= 0 && j1 < m as i32 && !seen.contains(&(i1, j1)) {
+                            seen.insert((i1, j1));
+                            let c = lines[i1 as usize].as_bytes()[j1 as usize];
+                            if c == b'*' {
+                                let it = sol.entry((i1, j1)).or_insert((0, 1));
+                                if it.0 <= 2{
+                                    *it = (it.0 + 1, it.1 * cur);
+                                }
+                            }
                         }
                     }
                 }
-
-                acc
-            })
-            .values()
-            .filter_map(|values| {
-                if let [a, b] = values.as_slice() {
-                    Some(*a * *b)
-                } else {
-                    None
-                }
-            })
-            .sum(),
-    )
+            }
+            
+            j += 1;
+        }
+    }
+    for (_gear, (val, prod)) in sol{
+        if val == 2{
+            ans += prod;
+        }
+    }
+    Some(ans)
 }
 
 #[cfg(test)]

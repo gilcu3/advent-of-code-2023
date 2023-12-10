@@ -1,7 +1,7 @@
 [package]
 name = "advent_of_code"
 version = "1.0.0"
-authors = ["Marcelo Fornet <mfornet94@gmail.com>"]
+authors = ["gilcu3"]
 edition = "2021"
 default-run = "advent_of_code"
 publish = false

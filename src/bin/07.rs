@@ -1,98 +1,194 @@
-use itertools::Itertools;
-
+use std::collections::HashMap;
 advent_of_code::solution!(7);
 
-#[derive(Eq, PartialEq, Copy, Clone, Debug, Ord, PartialOrd)]
-enum HandType {
-    HighCard,
-    OnePair,
-    TwoPairs,
-    ThreeOfAKind,
-    FullHouse,
-    FourOfAKind,
-    FiveOfAKind,
-}
-
-#[derive(Eq, PartialEq, Debug, PartialOrd, Ord)]
-struct Hand {
-    hand_type: HandType,
-    cards: Vec<u32>,
-}
-
-impl Hand {
-    fn new(cards: Vec<u32>) -> Self {
-        let mut new_cards = cards.clone();
-        new_cards.retain(|x| *x != 0);
-        let n_zeros = cards.len() - new_cards.len();
-
-        let mut groups = new_cards
-            .into_iter()
-            .sorted()
-            .group_by(|x| *x)
-            .into_iter()
-            .map(|(_, g)| g.count())
-            .sorted()
-            .collect::<Vec<_>>();
-
-        if let Some(last) = groups.last_mut() {
-            *last += n_zeros;
-        } else {
-            groups.push(n_zeros);
-        }
-
-        let hand_type = match groups.as_slice() {
-            [1, 1, 1, 1, 1] => HandType::HighCard,
-            [1, 1, 1, 2] => HandType::OnePair,
-            [1, 2, 2] => HandType::TwoPairs,
-            [1, 1, 3] => HandType::ThreeOfAKind,
-            [2, 3] => HandType::FullHouse,
-            [1, 4] => HandType::FourOfAKind,
-            [5] => HandType::FiveOfAKind,
-            _ => unreachable!(),
-        };
-
-        Self { cards, hand_type }
+fn card_rank(card: (String, u32)) -> u32 {
+    let s = card.0;
+    let mut cc = HashMap::new();
+    for c in s.chars(){
+        let count = cc.entry(c).or_insert(0);
+        *count += 1;
+    }
+    match cc.len() {
+        5 => 1,
+        4 => 2,
+        3 => {
+            if cc.values().max().unwrap() == &2 {
+                3
+            }
+            else{
+                4
+            }
+        },
+        2 => {
+            if cc.values().max().unwrap() == &4 {
+                6
+            }
+            else{
+                5
+            }
+        },
+        1 => 7,
+        _ => panic!("Invalid card")
     }
 }
 
-fn parse(s: &str, joker: bool) -> Hand {
-    let jack = if joker { 0 } else { 11 };
-    let cards = s
-        .chars()
-        .map(|card| match card {
-            'A' => 14,
-            'K' => 13,
-            'Q' => 12,
-            'J' => jack,
-            'T' => 10,
-            _ => card.to_digit(10).unwrap(),
-        })
-        .collect();
-    Hand::new(cards)
+fn char_rank(c: char) -> u32 {
+    match c {
+        'T' => 9,
+        'J' => 10,
+        'Q' => 11,
+        'K' => 12,
+        'A' => 13,
+        _ => c.to_digit(10).unwrap() - 1,
+    }
 }
 
-fn solve(input: &str, joker: bool) -> Option<u64> {
-    Some(
-        input
-            .lines()
-            .map(|line| {
-                let (hand, bid) = line.split_once(' ').unwrap();
-                let bid = bid.parse::<u64>().unwrap();
-                (parse(hand, joker), bid)
-            })
-            .sorted_unstable_by(|a, b| a.0.cmp(&b.0))
-            .enumerate()
-            .map(|(i, (_, bid))| (i as u64 + 1) * bid)
-            .sum::<u64>(),
-    )
+pub fn part_one(input: &str) -> Option<u32> {
+    let mut cards: Vec<(String, u32)> = Vec::new();
+    
+    for line in input.lines(){
+        if line.trim().len() > 0 {
+            let (card, bid) = line.split_at(line.find(' ').unwrap());
+            cards.push((card.to_string(), bid.trim().parse::<u32>().unwrap()));
+        }
+        
+    }
+
+    cards.sort_by(|a, b| {
+        // Comparaison des chaînes (String)
+        let ra = card_rank(a.clone());
+        let rb = card_rank(b.clone());
+        if ra != rb {
+            return ra.cmp(&rb);
+        }
+        else{
+            for i in 0..5{
+                let ca = char_rank(a.0.chars().nth(i).unwrap());
+                let cb = char_rank(b.0.chars().nth(i).unwrap());
+                if ca != cb {
+                    return ca.cmp(&cb);
+                }
+            }
+            return std::cmp::Ordering::Equal;
+        }
+    });
+    let mut ans: u32 = 0;
+    for (i, card) in cards.iter().enumerate() {
+        ans += (i as u32 + 1)  * card.1;
+    }
+    Some(ans)
 }
 
-pub fn part_one(input: &str) -> Option<u64> {
-    solve(input, false)
+fn card_rank2(card: (String, u32)) -> u32 {
+    let s = card.0;
+    let mut cc = HashMap::new();
+    let mut jj = 0;
+    for c in s.chars(){
+        if c == 'J'{
+            jj += 1;
+        }
+        else{
+            let count = cc.entry(c).or_insert(0);
+            *count += 1;
+        }
+        
+    }
+    if jj == 0{
+        match cc.len() {
+            5 => 1,
+            4 => 2,
+            3 => {
+                if cc.values().max().unwrap() == &2 {
+                    3
+                }
+                else{
+                    4
+                }
+            },
+            2 => {
+                if cc.values().max().unwrap() == &4 {
+                    6
+                }
+                else{
+                    5
+                }
+            },
+            1 => 7,
+            _ => panic!("Invalid card")
+        }
+    }
+    else{
+        match cc.len() {
+            5 => panic!("Invalid card"),
+            4 => 2,
+            3 => 4,
+            2 => {
+                if jj == 1 {
+                    if cc.values().max().unwrap() == &3 {
+                        6
+                    }
+                    else{
+                        5
+                    }
+                }
+                else{
+                    6
+                }
+            },
+            1 => 7,
+            0 => 7,
+            _ => panic!("Invalid card")
+        }
+    }
+    
 }
 
-pub fn part_two(input: &str) -> Option<u64> {
-    solve(input, true)
+fn char_rank2(c: char) -> u32 {
+    match c {
+        'T' => 9,
+        'J' => 0,
+        'Q' => 11,
+        'K' => 12,
+        'A' => 13,
+        _ => c.to_digit(10).unwrap() - 1,
+    }
+}
+
+
+pub fn part_two(input: &str) -> Option<u32> {
+    let mut cards: Vec<(String, u32)> = Vec::new();
+    
+    for line in input.lines(){
+        if line.trim().len() > 0 {
+            let (card, bid) = line.split_at(line.find(' ').unwrap());
+            cards.push((card.to_string(), bid.trim().parse::<u32>().unwrap()));
+        }
+        
+    }
+
+    cards.sort_by(|a, b| {
+        // Comparaison des chaînes (String)
+        let ra = card_rank2(a.clone());
+        let rb = card_rank2(b.clone());
+        if ra != rb {
+            return ra.cmp(&rb);
+        }
+        else{
+            for i in 0..5{
+                let ca = char_rank2(a.0.chars().nth(i).unwrap());
+                let cb = char_rank2(b.0.chars().nth(i).unwrap());
+                if ca != cb {
+                    return ca.cmp(&cb);
+                }
+            }
+            return std::cmp::Ordering::Equal;
+        }
+    });
+    let mut ans: u32 = 0;
+    for (i, card) in cards.iter().enumerate() {
+        ans += (i as u32 + 1)  * card.1;
+    }
+    Some(ans)
 }
 
 #[cfg(test)]

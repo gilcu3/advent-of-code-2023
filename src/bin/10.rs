@@ -1,233 +1,261 @@
-use std::{collections::HashSet, vec};
-
-use itertools::Itertools;
+use std::vec;
 
 advent_of_code::solution!(10);
 
-type Graph = Vec<Vec<Vec<(usize, usize)>>>;
-
-fn go(
-    sx: usize,
-    sy: usize,
-    tx: usize,
-    ty: usize,
-    graph: &mut [Vec<Vec<(usize, usize)>>],
-) -> Option<Vec<(usize, usize)>> {
-    let mut x = sx;
-    let mut y = sy;
-    let mut px = tx;
-    let mut py = ty;
-
-    let mut the_loop = vec![(tx, ty)];
-
-    while (x, y) != (tx, ty) {
-        the_loop.push((x, y));
-
-        let mut found = false;
-
-        for &(nx, ny) in &graph[x][y] {
-            if (nx, ny) == (px, py) {
-                continue;
+fn todir(from: usize, c: char) -> usize{
+    match c{
+        '|' => {
+            if from % 2 == 1 {
+                (from + 2) % 4
+            }else{
+                4
             }
-
-            if (nx, ny) == (tx, ty) || graph[nx][ny].contains(&(x, y)) {
-                found = true;
-                px = x;
-                py = y;
-                x = nx;
-                y = ny;
-                break;
+        },
+        '-' => {
+            if from % 2 == 0 {
+                (from + 2) % 4
+            }else{
+                4
             }
-        }
-
-        if !found {
-            return None;
-        }
+        },
+        'L' => {
+            if from == 0 {
+                1
+            }
+            else if from == 1{
+                0
+            }
+            else{
+                4
+            }
+        },
+        'J' => {
+            if from == 2 {
+                1
+            }
+            else if from == 1{
+                2
+            }
+            else{
+                4
+            }
+        },
+        '7' => {
+            if from == 2 {
+                3
+            }
+            else if from == 3{
+                2
+            }
+            else{
+                4
+            }
+        },
+        'F' => {
+            if from == 0 {
+                3
+            }
+            else if from == 3{
+                0
+            }
+            else{
+                4
+            }
+        },
+        _ => 4,
     }
-
-    graph[tx][ty].push((sx, sy));
-    graph[tx][ty].push((px, py));
-
-    Some(the_loop)
-}
-
-fn build_graph(input: &str) -> (Graph, (usize, usize)) {
-    let board = input
-        .lines()
-        .map(|line| line.chars().collect_vec())
-        .collect_vec();
-
-    let n = board.len();
-    let m = board[0].len();
-
-    let mut graph = vec![vec![vec![]; m]; n];
-    let mut start = None;
-
-    for (i, j) in (0..n).cartesian_product(0..m) {
-        match board[i][j] {
-            '|' => {
-                if i + 1 < n {
-                    graph[i][j].push((i + 1, j));
-                }
-                if i > 0 {
-                    graph[i][j].push((i - 1, j));
-                }
-            }
-            '-' => {
-                if j + 1 < m {
-                    graph[i][j].push((i, j + 1));
-                }
-                if j > 0 {
-                    graph[i][j].push((i, j - 1));
-                }
-            }
-            'L' => {
-                if j + 1 < m {
-                    graph[i][j].push((i, j + 1));
-                }
-                if i > 0 {
-                    graph[i][j].push((i - 1, j));
-                }
-            }
-            'J' => {
-                if j > 0 {
-                    graph[i][j].push((i, j - 1));
-                }
-                if i > 0 {
-                    graph[i][j].push((i - 1, j));
-                }
-            }
-            '7' => {
-                if j > 0 {
-                    graph[i][j].push((i, j - 1));
-                }
-                if i + 1 < n {
-                    graph[i][j].push((i + 1, j));
-                }
-            }
-            'F' => {
-                if j + 1 < m {
-                    graph[i][j].push((i, j + 1));
-                }
-                if i + 1 < n {
-                    graph[i][j].push((i + 1, j));
-                }
-            }
-            'S' => {
-                assert!(start.is_none());
-                start = Some((i, j));
-            }
-            '.' => {}
-            _ => unreachable!(),
-        }
-    }
-
-    (graph, start.unwrap())
-}
-
-fn find_loop(
-    graph: &mut Vec<Vec<Vec<(usize, usize)>>>,
-    sx: usize,
-    sy: usize,
-) -> Vec<(usize, usize)> {
-    let n = graph.len();
-    let m = graph[0].len();
-
-    let mut the_loop = None;
-
-    for &(dx, dy) in &[(0, 1), (0, -1), (1, 0), (-1, 0)] {
-        let nx = sx as i32 + dx;
-        let ny = sy as i32 + dy;
-
-        if nx < 0 || nx >= n as i32 || ny < 0 || ny >= m as i32 {
-            continue;
-        }
-
-        let nx = nx as usize;
-        let ny = ny as usize;
-
-        if !graph[nx][ny].contains(&(sx, sy)) {
-            continue;
-        }
-
-        if let Some(found_loop) = go(nx, ny, sx, sy, graph) {
-            the_loop = Some(found_loop);
-            break;
-        }
-    }
-
-    the_loop.unwrap()
 }
 
 pub fn part_one(input: &str) -> Option<usize> {
-    let (mut graph, (sx, sy)) = build_graph(input);
-    Some(find_loop(&mut graph, sx, sy).len() / 2)
+    let mut mm: Vec<String> = Vec::new();
+    for (_i, line) in input.lines().into_iter().enumerate(){
+        if line.trim().len() > 0  {
+            mm.push(line.trim().to_string());
+        }
+    }
+    
+    let n = mm.len();
+    let m = mm[0].len();
+    let  (mut si, mut sj) = (-1, -1);
+    for i in 0..n{
+        for j in 0..m{
+            if mm[i].chars().nth(j).unwrap() == 'S'{
+                si = i as i32;
+                sj = j as i32;
+            }
+        }
+    }
+    //println!("{} {}", si, sj);
+    let mut dis:Vec<Vec<isize>> = vec![vec![-1; m]; n];
+    dis[si as usize][sj as usize] = 0;
+    let mut que = Vec::new();
+    let dirs = vec![(0, 1), (-1, 0), (0, -1), (1, 0)];
+    for d in 0..4{
+        let (di, dj) = dirs[d];
+        let (ni, nj) = (si + di, sj + dj);
+        if ni >= 0 && ni < n as i32 && nj >= 0 && nj < m as i32{
+            let c = mm[ni as usize].chars().nth(nj as usize).unwrap();
+            let dd = todir((d + 2) % 4, c);
+            //println!("{} {} {} {} {}", ni, nj, c, d, dd);
+            if dd < 4{
+                que.push((ni, nj, dd));
+                dis[ni as usize][nj as usize] = 1;
+            }
+            
+        }
+    }
+    let mut ans =0;
+    let mut front = 0;
+    while front < que.len(){
+        let (i, j, d) = que[front];
+        //println!("{} {} {}", i, j, d);
+        front += 1;
+        ans = std::cmp::max(ans, dis[i as usize][j as usize]);
+        let (di, dj) = dirs[d];
+        let (ni, nj) = (i + di, j + dj);
+        if ni >= 0 && ni < n as i32 && nj >= 0 && nj < m as i32 && dis[ni as usize][nj as usize] == -1{
+            let c = mm[ni as usize].chars().nth(nj as usize).unwrap();
+            let dd = todir((d + 2) % 4, c);
+            if dd < 4{
+                que.push((ni, nj, dd));
+                dis[ni as usize][nj as usize] = dis[i as usize][j as usize] + 1;
+            }
+        }
+        
+    }
+    Some(ans as usize)
 }
 
-enum WindDir {
-    Up,
-    Down,
-}
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let (mut graph, (sx, sy)) = build_graph(input);
-    let the_loop = find_loop(&mut graph, sx, sy)
-        .into_iter()
-        .collect::<HashSet<_>>();
-
-    let mut answer = 0;
-    let n = graph.len();
-    let m = graph[0].len();
-
-    let has_up = |x: usize, y: usize| -> bool { x > 0 && graph[x][y].contains(&(x - 1, y)) };
-    let has_down = |x: usize, y: usize| -> bool { x + 1 < n && graph[x][y].contains(&(x + 1, y)) };
-
-    for x in 0..n {
-        let mut wind = 0;
-        let mut last = None;
-
-        for y in 0..m {
-            if the_loop.contains(&(x, y)) {
-                let up = has_up(x, y);
-                let down = has_down(x, y);
-
-                if up && down {
-                    assert!(last.is_none());
-                    wind ^= 1;
-                } else if down {
-                    match last {
-                        None => {
-                            last = Some(WindDir::Down);
-                        }
-                        Some(WindDir::Up) => {
-                            wind ^= 1;
-                            last = None;
-                        }
-                        Some(WindDir::Down) => {
-                            last = None;
-                        }
-                    }
-                } else if up {
-                    match last {
-                        None => {
-                            last = Some(WindDir::Up);
-                        }
-                        Some(WindDir::Down) => {
-                            wind ^= 1;
-                            last = None;
-                        }
-                        Some(WindDir::Up) => {
-                            last = None;
-                        }
+    let mut mm: Vec<String> = Vec::new();
+    for (_i, line) in input.lines().into_iter().enumerate(){
+        if line.trim().len() > 0  {
+            mm.push(line.trim().to_string());
+        }
+    }
+    
+    let n = mm.len();
+    let m = mm[0].len();
+    let  (mut si, mut sj) = (-1, -1);
+    for i in 0..n{
+        for j in 0..m{
+            if mm[i].chars().nth(j).unwrap() == 'S'{
+                si = i as i32;
+                sj = j as i32;
+            }
+        }
+    }
+    //println!("{} {}", si, sj);
+    let mut seen = vec![vec![false; m]; n];
+    seen[si as usize][sj as usize] = true;
+    let mut que = Vec::new();
+    let dirs = vec![(0, 1), (-1, 0), (0, -1), (1, 0)];
+    let mut ddir = Vec::new();
+    for d in 0..4{
+        let (di, dj) = dirs[d];
+        let (ni, nj) = (si + di, sj + dj);
+        if ni >= 0 && ni < n as i32 && nj >= 0 && nj < m as i32{
+            let c = mm[ni as usize].chars().nth(nj as usize).unwrap();
+            let dd = todir((d + 2) % 4, c);
+            //println!("{} {} {} {} {}", ni, nj, c, d, dd);
+            if dd < 4{
+                ddir.push(d);
+                que.push((ni, nj, dd));
+                seen[ni as usize][nj as usize] = true;
+            }
+            
+        }
+    }
+    
+    let c = match (ddir[0], ddir[1]){
+        (0, 3) => {
+            "F"
+        },
+        (0, 1) => {
+            "L"
+        },
+        (1, 2) => {
+            "J"
+        },
+        (2, 3) => {
+            "7"
+        },
+        (1, 3) => {
+            "|"
+        },
+        (0, 2) => {
+            "-"
+        },
+        _ => panic!(),
+    };
+    mm[si as usize] = mm[si as usize].replace("S", c);
+    
+    let mut front = 0;
+    while front < que.len(){
+        let (i, j, d) = que[front];
+        //println!("{} {} {}", i, j, d);
+        front += 1;
+        let (di, dj) = dirs[d];
+        let (ni, nj) = (i + di, j + dj);
+        if ni >= 0 && ni < n as i32 && nj >= 0 && nj < m as i32 && !seen[ni as usize][nj as usize]{
+            let c = mm[ni as usize].chars().nth(nj as usize).unwrap();
+            let dd = todir((d + 2) % 4, c);
+            if dd < 4{
+                que.push((ni, nj, dd));
+                seen[ni as usize][nj as usize] = true;
+            }
+        }
+        
+    }
+    //println!("{}", mm[si as usize].chars().nth(sj as usize).unwrap());
+    let mut ans = 0;
+    for i in 0..n{
+        let mut c = 0;
+        let mut ss = '.';
+        for j in 0..m{
+            if seen[i][j]{
+                let cc = mm[i].chars().nth(j).unwrap();
+                match cc{
+                    'F' => {
+                        c += 1;
+                        ss = 'F';
+                    },
+                    'L' => {
+                        c += 1;
+                        ss = 'L';
+                    },
+                    'J' => {
+                        if ss != 'F'{
+                            c += 1;
+                        } 
+                        ss = '.';
+                    },
+                    '7' => {
+                        if ss != 'L'{
+                            c += 1;
+                        } 
+                        ss = '.';
+                    },
+                    '|' => {
+                        c += 1;
+                    },
+                    '-' => {
+                        
+                    },
+                    _ => {
+                        panic!();
                     }
                 }
-            } else {
-                answer += wind;
+            }
+            else if c % 2 == 1{
+                //println!("{} {} {}", i, j, mm[i].chars().nth(j).unwrap());
+                ans += 1;
             }
         }
     }
 
-    Some(answer)
+    Some(ans)
 }
 
 #[cfg(test)]

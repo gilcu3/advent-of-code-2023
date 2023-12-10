@@ -1,40 +1,65 @@
 advent_of_code::solution!(9);
 
-pub fn solve(input: &str, first: bool) -> i64 {
-    input
-        .lines()
-        .map(|line| {
-            let mut base = line
-                .split_ascii_whitespace()
-                .map(|number| number.parse::<i64>().unwrap())
-                .collect::<Vec<_>>();
 
-            if first {
-                base.reverse();
+pub fn part_one(input: &str) -> Option<i32> {
+    let mut vals: Vec<Vec<i32>> = Vec::new();
+    let mut ans = 0;
+    for (_i, line) in input.lines().into_iter().enumerate(){
+        if line.trim().len() > 0  {
+            vals.push(Vec::new());
+            line.split_whitespace().for_each(|x| vals[0].push(x.parse::<i32>().unwrap()));
+
+            while vals[vals.len() - 1].iter().min() != vals[vals.len() - 1].iter().max() || vals[vals.len() - 1][0] != 0{
+                let mut nval = Vec::new();
+                for i in 0..vals[vals.len() - 1].len()-1{
+                    nval.push(vals[vals.len() - 1][i + 1] - vals[vals.len() - 1][i]);
+                }
+                //println!("{:?}",nval);
+                vals.push(nval);
             }
-
-            let mut answer = 0;
-
-            while !base.iter().all(|&x| x == 0) {
-                answer += *base.last().unwrap();
-                base = base
-                    .iter()
-                    .zip(base.iter().skip(1))
-                    .map(|(&x, &y)| y - x)
-                    .collect();
+            let n = vals.len();
+            vals[n - 1].push(0);
+            for i in (0..n-1).rev(){
+                let c1 = vals[i + 1].last().unwrap().clone();
+                let c = vals[i].last().unwrap().clone();
+                vals[i].push(c + c1);
+                //println!("{} {:?}",i, vals[i]);
             }
-
-            answer
-        })
-        .sum::<i64>()
+            
+            ans += vals[0].last().unwrap().clone();
+            vals.clear();
+        }
+    }
+    Some(ans)
 }
 
-pub fn part_one(input: &str) -> Option<i64> {
-    Some(solve(input, false))
-}
+pub fn part_two(input: &str) -> Option<i32> {
+    let mut vals: Vec<Vec<i32>> = Vec::new();
+    let mut ans = 0;
+    for (_i, line) in input.lines().into_iter().enumerate(){
+        if line.trim().len() > 0  {
+            vals.push(Vec::new());
+            line.split_whitespace().for_each(|x| vals[0].push(x.parse::<i32>().unwrap()));
 
-pub fn part_two(input: &str) -> Option<i64> {
-    Some(solve(input, true))
+            while vals[vals.len() - 1].iter().min() != vals[vals.len() - 1].iter().max() || vals[vals.len() - 1][0] != 0{
+                let mut nval = Vec::new();
+                for i in 0..vals[vals.len() - 1].len()-1{
+                    nval.push(vals[vals.len() - 1][i + 1] - vals[vals.len() - 1][i]);
+                }
+                //println!("{:?}",nval);
+                vals.push(nval);
+            }
+            let n = vals.len();
+            let mut cur = 0;
+            for i in (0..n-1).rev(){
+                cur = vals[i][0] - cur;
+            }
+            
+            ans += cur;
+            vals.clear();
+        }
+    }
+    Some(ans)
 }
 
 #[cfg(test)]

@@ -1,134 +1,90 @@
-use std::{collections::BTreeMap, str::FromStr};
+use std::collections::HashSet;
 
-use itertools::Itertools;
 
 advent_of_code::solution!(5);
 
-#[derive(Debug)]
-struct MapRange {
-    updated_ranges: BTreeMap<u64, (u64, u64)>,
-}
-
-impl MapRange {
-    fn convert(&self, value: u64) -> u64 {
-        if let Some((&src, &(dst, len))) = self.updated_ranges.range(..=value).next_back() {
-            assert!(src <= value);
-            if value < src + len {
-                return dst + (value - src);
-            }
-        }
-        value
-    }
-
-    fn convert_range(&self, mut range: (u64, u64)) -> Vec<(u64, u64)> {
-        let mut answer = vec![];
-        for (&src, &(dst, len)) in self.updated_ranges.iter() {
-            if range.0 == range.1 {
-                break;
-            }
-
-            if range.0 < src {
-                let end = std::cmp::min(src, range.1);
-                answer.push((range.0, end));
-                range.0 = end;
-            }
-
-            if range.0 == range.1 {
-                break;
-            }
-
-            assert!(src <= range.0);
-
-            if range.0 < src + len {
-                let end = std::cmp::min(src + len, range.1);
-                answer.push((dst + (range.0 - src), dst + (end - src)));
-                range.0 = end;
-            }
-        }
-
-        if range.0 < range.1 {
-            answer.push(range);
-        }
-
-        answer
-    }
-}
-
-impl FromStr for MapRange {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (_, data) = s.split_once(':').unwrap();
-
-        Ok(Self {
-            updated_ranges: data
-                .trim_start_matches('\n')
-                .split('\n')
-                .map(|ranges| {
-                    let (dst, src, len) = ranges
-                        .split_ascii_whitespace()
-                        .map(|s| s.parse::<u64>().unwrap())
-                        .next_tuple()
-                        .unwrap();
-
-                    (src, (dst, len))
-                })
-                .collect::<BTreeMap<_, _>>(),
-        })
-    }
-}
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let input = input.trim_end_matches('\n');
-    let mut it = input.split("\n\n");
-    let seeds = it.next().unwrap();
-    let seeds = seeds
-        .split_once(':')
-        .unwrap()
-        .1
-        .split_ascii_whitespace()
-        .map(|s| s.parse::<u64>().unwrap())
-        .collect::<Vec<_>>();
+    let mut cur = HashSet::<u64>::new();
+    let mut nx = HashSet::<u64>::new();
+    
+    for line in input.lines(){
+        if line.starts_with("seeds"){
+            line.split_whitespace().skip(1).for_each(|x| {nx.insert(x.parse::<u64>().unwrap());});
+        }
+        else if line.trim().len() == 0{
+            for n in cur{
+                nx.insert(n);
+            }
+            cur = nx.clone();
+            nx = HashSet::<u64>::new();
+        }
+        else if line.contains(":"){
 
-    it.fold(seeds, |seeds, line| {
-        let ranges = line.parse::<MapRange>().unwrap();
-        seeds
-            .into_iter()
-            .map(|seed| ranges.convert(seed))
-            .collect::<Vec<_>>()
-    })
-    .into_iter()
-    .min()
+        }
+        else{
+            let conv = line.split_whitespace().map(|x| x.parse::<u64>().unwrap()).collect::<Vec<_>>();
+            let ocur = cur.clone().into_iter().collect::<Vec<u64>>();
+            for n in ocur {
+                if n >= conv[1] && n < conv[1] + conv[2]{
+                    nx.insert(n - conv[1] + conv[0]);
+                    cur.remove(&n);
+                }
+            }
+        }
+    }
+    for n in cur{
+        nx.insert(n);
+    }
+    let ans: u64 = nx.iter().min().unwrap().clone();
+    Some(ans)
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    let input = input.trim_end_matches('\n');
-    let mut it = input.split("\n\n");
-    let seeds = it.next().unwrap();
-    let seeds = seeds
-        .split_once(':')
-        .unwrap()
-        .1
-        .split_ascii_whitespace()
-        .map(|s| s.parse::<u64>().unwrap())
-        .chunks(2)
-        .into_iter()
-        .map(|mut c| {
-            let (start, len) = c.next_tuple().unwrap();
-            (start, start + len)
-        })
-        .collect::<Vec<_>>();
+    let mut cur = HashSet::<(u64, u64)>::new();
+    let mut nx = HashSet::<(u64, u64)>::new();
+    
+    for line in input.lines(){
+        if line.starts_with("seeds"){
+            let mut vv = Vec::<u64>::new();
+            line.split_whitespace().skip(1).for_each(|x| {vv.push(x.parse::<u64>().unwrap());});
+            for i in (0..vv.len()).step_by(2){
+                nx.insert((vv[i], vv[i + 1]));
+            }
+        }
+        else if line.trim().len() == 0{
+            for n in cur{
+                nx.insert(n);
+            }
+            cur = nx.clone();
+            nx = HashSet::<(u64, u64)>::new();
+        }
+        else if line.contains(":"){
 
-    it.fold(seeds, |seeds, line| {
-        let ranges = line.parse::<MapRange>().unwrap();
-        seeds
-            .into_iter()
-            .flat_map(|seed| ranges.convert_range(seed))
-            .collect::<Vec<_>>()
-    })
-    .into_iter()
-    .map(|(start, _)| start)
-    .min()
+        }
+        else{
+            let conv = line.split_whitespace().map(|x| x.parse::<u64>().unwrap()).collect::<Vec<_>>();
+            let ocur = cur.clone().into_iter().collect::<Vec<(u64, u64)>>();
+            for (n, jn) in ocur {
+                if n + jn > conv[1] && n < conv[1] + conv[2]{
+                    let (b, e) = (std::cmp::max(n, conv[1]), std::cmp::min(n + jn, conv[1] + conv[2]));
+                    nx.insert((b - conv[1] + conv[0], e - b));
+                    cur.remove(&(n, jn));
+                    if e < n + jn{
+                        cur.insert((e, n + jn - e));
+                    }
+                    if b > n{
+                        cur.insert((n, b - n));
+                    }
+                }
+            }
+        }
+    }
+    for n in cur{
+        nx.insert(n);
+    }
+    let ans: u64 = nx.iter().map(| (a, _b)|  a).min().unwrap().clone();
+    Some(ans)
 }
 
 #[cfg(test)]

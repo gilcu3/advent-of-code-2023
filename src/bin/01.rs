@@ -1,62 +1,61 @@
-use std::collections::HashMap;
-
-use aho_corasick::AhoCorasick;
-
 advent_of_code::solution!(1);
 
 pub fn part_one(input: &str) -> Option<u32> {
-    Some(
-        input
-            .lines()
-            .map(|line| {
-                let mut it = line.chars().filter_map(|c| c.to_digit(10));
-                let first = it.next().unwrap();
-                let last = it.last().unwrap_or(first);
-                first * 10 + last
-            })
-            .sum(),
-    )
+    let mut ans: u32 = 0;
+    for line in input.lines(){
+        let mut first: bool = false;
+        let mut cur: u32 = 0;
+        for c in line.chars() {
+            // print char
+            if c.is_digit(10) {
+                if !first{
+                    cur += 10 * c.to_digit(10).unwrap();
+                    first = true;
+                }
+                cur = cur / 10 * 10 + c.to_digit(10).unwrap();
+            }
+        }
+        ans += cur;
+    }
+    Some(ans)
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let digits = HashMap::from([
-        ("1", 1),
-        ("one", 1),
-        ("2", 2),
-        ("two", 2),
-        ("3", 3),
-        ("three", 3),
-        ("4", 4),
-        ("four", 4),
-        ("5", 5),
-        ("five", 5),
-        ("6", 6),
-        ("six", 6),
-        ("7", 7),
-        ("seven", 7),
-        ("8", 8),
-        ("eight", 8),
-        ("9", 9),
-        ("nine", 9),
-    ]);
+    let mut ans: u32 = 0;
+    let digits = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+    for line in input.lines(){
+        let mut first: bool = false;
+        let mut cur: u32 = 0;
 
-    let ac = AhoCorasick::new(digits.keys()).unwrap();
-
-    Some(
-        input
-            .lines()
-            .map(|line| {
-                let mut it = ac
-                    .find_overlapping_iter(line)
-                    .map(|m| digits.get(&line[m.start()..m.end()]).copied().unwrap());
-
-                let first = it.next().unwrap();
-                let last = it.last().unwrap_or(first);
-
-                first * 10 + last
-            })
-            .sum(),
-    )
+        for i in 0..line.len() {
+            let c = line.chars().nth(i).unwrap();
+            if c.is_digit(10) {
+                if !first{
+                    cur += 10 * c.to_digit(10).unwrap();
+                    first = true;
+                }
+                cur = cur / 10 * 10 + c.to_digit(10).unwrap();
+            }
+            else if c.is_alphabetic() {
+                let mut d: u32 = 0;
+                for k in 0..9 {
+                    if line[i..].starts_with(digits[k]) {
+                        d = (k + 1) as u32;
+                        break;
+                    }
+                }
+                if d != 0 {
+                    if !first{
+                        cur += 10 * d;
+                        first = true;
+                    }
+                    cur = cur / 10 * 10 + d;
+                }
+            }
+        }
+        ans += cur;
+    }
+    Some(ans)
 }
 
 #[cfg(test)]
