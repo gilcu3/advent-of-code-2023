@@ -68,8 +68,8 @@ fn todir(from: usize, c: char) -> usize{
 
 pub fn part_one(input: &str) -> Option<usize> {
     let mut mm: Vec<String> = Vec::new();
-    for (_i, line) in input.lines().into_iter().enumerate(){
-        if line.trim().len() > 0  {
+    for (_i, line) in input.lines().enumerate(){
+        if !line.trim().is_empty()  {
             mm.push(line.trim().to_string());
         }
     }
@@ -77,9 +77,9 @@ pub fn part_one(input: &str) -> Option<usize> {
     let n = mm.len();
     let m = mm[0].len();
     let  (mut si, mut sj) = (-1, -1);
-    for i in 0..n{
+    for (i, row) in mm.iter().enumerate(){
         for j in 0..m{
-            if mm[i].chars().nth(j).unwrap() == 'S'{
+            if row.chars().nth(j).unwrap() == 'S'{
                 si = i as i32;
                 sj = j as i32;
             }
@@ -89,9 +89,8 @@ pub fn part_one(input: &str) -> Option<usize> {
     let mut dis:Vec<Vec<isize>> = vec![vec![-1; m]; n];
     dis[si as usize][sj as usize] = 0;
     let mut que = Vec::new();
-    let dirs = vec![(0, 1), (-1, 0), (0, -1), (1, 0)];
-    for d in 0..4{
-        let (di, dj) = dirs[d];
+    let dirs = [(0, 1), (-1, 0), (0, -1), (1, 0)];
+    for (d, (di, dj)) in dirs.iter().enumerate(){
         let (ni, nj) = (si + di, sj + dj);
         if ni >= 0 && ni < n as i32 && nj >= 0 && nj < m as i32{
             let c = mm[ni as usize].chars().nth(nj as usize).unwrap();
@@ -129,8 +128,8 @@ pub fn part_one(input: &str) -> Option<usize> {
 
 pub fn part_two(input: &str) -> Option<u32> {
     let mut mm: Vec<String> = Vec::new();
-    for (_i, line) in input.lines().into_iter().enumerate(){
-        if line.trim().len() > 0  {
+    for (_i, line) in input.lines().enumerate(){
+        if !line.trim().is_empty()  {
             mm.push(line.trim().to_string());
         }
     }
@@ -138,9 +137,9 @@ pub fn part_two(input: &str) -> Option<u32> {
     let n = mm.len();
     let m = mm[0].len();
     let  (mut si, mut sj) = (-1, -1);
-    for i in 0..n{
+    for (i, row) in mm.iter().enumerate(){
         for j in 0..m{
-            if mm[i].chars().nth(j).unwrap() == 'S'{
+            if row.chars().nth(j).unwrap() == 'S'{
                 si = i as i32;
                 sj = j as i32;
             }
@@ -150,10 +149,9 @@ pub fn part_two(input: &str) -> Option<u32> {
     let mut seen = vec![vec![false; m]; n];
     seen[si as usize][sj as usize] = true;
     let mut que = Vec::new();
-    let dirs = vec![(0, 1), (-1, 0), (0, -1), (1, 0)];
+    let dirs = [(0, 1), (-1, 0), (0, -1), (1, 0)];
     let mut ddir = Vec::new();
-    for d in 0..4{
-        let (di, dj) = dirs[d];
+    for (d, (di, dj)) in dirs.iter().enumerate(){
         let (ni, nj) = (si + di, sj + dj);
         if ni >= 0 && ni < n as i32 && nj >= 0 && nj < m as i32{
             let c = mm[ni as usize].chars().nth(nj as usize).unwrap();
@@ -189,7 +187,7 @@ pub fn part_two(input: &str) -> Option<u32> {
         },
         _ => panic!(),
     };
-    mm[si as usize] = mm[si as usize].replace("S", c);
+    mm[si as usize] = mm[si as usize].replace('S', c);
     
     let mut front = 0;
     while front < que.len(){

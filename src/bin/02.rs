@@ -6,7 +6,7 @@ advent_of_code::solution!(2);
 fn parse_game_data(data: String) -> Vec<(u32, Vec<HashMap<String, u32>>)> {
     let mut games = Vec::new();
 
-    for line in data.split("\n") {
+    for line in data.split('\n') {
         if line.trim().is_empty() {
             continue;
         }
@@ -22,7 +22,7 @@ fn parse_game_data(data: String) -> Vec<(u32, Vec<HashMap<String, u32>>)> {
             let mut colors_count = HashMap::new();
 
             for pair in round.trim().split(',') {
-                let mut iter = pair.trim().split_whitespace();
+                let mut iter = pair.split_whitespace();
                 let count = iter.next().unwrap().parse::<u32>().unwrap();
                 let color = iter.next().unwrap().to_string();
                 colors_count.insert(color, count);

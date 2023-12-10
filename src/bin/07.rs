@@ -47,7 +47,7 @@ pub fn part_one(input: &str) -> Option<u32> {
     let mut cards: Vec<(String, u32)> = Vec::new();
     
     for line in input.lines(){
-        if line.trim().len() > 0 {
+        if !line.trim().is_empty() {
             let (card, bid) = line.split_at(line.find(' ').unwrap());
             cards.push((card.to_string(), bid.trim().parse::<u32>().unwrap()));
         }
@@ -59,7 +59,7 @@ pub fn part_one(input: &str) -> Option<u32> {
         let ra = card_rank(a.clone());
         let rb = card_rank(b.clone());
         if ra != rb {
-            return ra.cmp(&rb);
+            ra.cmp(&rb)
         }
         else{
             for i in 0..5{
@@ -69,7 +69,7 @@ pub fn part_one(input: &str) -> Option<u32> {
                     return ca.cmp(&cb);
                 }
             }
-            return std::cmp::Ordering::Equal;
+            std::cmp::Ordering::Equal
         }
     });
     let mut ans: u32 = 0;
@@ -159,7 +159,7 @@ pub fn part_two(input: &str) -> Option<u32> {
     let mut cards: Vec<(String, u32)> = Vec::new();
     
     for line in input.lines(){
-        if line.trim().len() > 0 {
+        if !line.trim().is_empty() {
             let (card, bid) = line.split_at(line.find(' ').unwrap());
             cards.push((card.to_string(), bid.trim().parse::<u32>().unwrap()));
         }
@@ -171,7 +171,7 @@ pub fn part_two(input: &str) -> Option<u32> {
         let ra = card_rank2(a.clone());
         let rb = card_rank2(b.clone());
         if ra != rb {
-            return ra.cmp(&rb);
+            ra.cmp(&rb)
         }
         else{
             for i in 0..5{
@@ -181,7 +181,7 @@ pub fn part_two(input: &str) -> Option<u32> {
                     return ca.cmp(&cb);
                 }
             }
-            return std::cmp::Ordering::Equal;
+            std::cmp::Ordering::Equal
         }
     });
     let mut ans: u32 = 0;

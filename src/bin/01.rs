@@ -7,7 +7,7 @@ pub fn part_one(input: &str) -> Option<u32> {
         let mut cur: u32 = 0;
         for c in line.chars() {
             // print char
-            if c.is_digit(10) {
+            if c.is_ascii_digit() {
                 if !first{
                     cur += 10 * c.to_digit(10).unwrap();
                     first = true;
@@ -29,7 +29,7 @@ pub fn part_two(input: &str) -> Option<u32> {
 
         for i in 0..line.len() {
             let c = line.chars().nth(i).unwrap();
-            if c.is_digit(10) {
+            if c.is_ascii_digit() {
                 if !first{
                     cur += 10 * c.to_digit(10).unwrap();
                     first = true;
@@ -38,8 +38,8 @@ pub fn part_two(input: &str) -> Option<u32> {
             }
             else if c.is_alphabetic() {
                 let mut d: u32 = 0;
-                for k in 0..9 {
-                    if line[i..].starts_with(digits[k]) {
+                for (k, dig) in digits.iter().enumerate() {
+                    if line[i..].starts_with(dig) {
                         d = (k + 1) as u32;
                         break;
                     }

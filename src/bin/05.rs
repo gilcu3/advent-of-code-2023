@@ -12,14 +12,14 @@ pub fn part_one(input: &str) -> Option<u64> {
         if line.starts_with("seeds"){
             line.split_whitespace().skip(1).for_each(|x| {nx.insert(x.parse::<u64>().unwrap());});
         }
-        else if line.trim().len() == 0{
+        else if line.trim().is_empty(){
             for n in cur{
                 nx.insert(n);
             }
             cur = nx.clone();
             nx = HashSet::<u64>::new();
         }
-        else if line.contains(":"){
+        else if line.contains(':'){
 
         }
         else{
@@ -36,7 +36,7 @@ pub fn part_one(input: &str) -> Option<u64> {
     for n in cur{
         nx.insert(n);
     }
-    let ans: u64 = nx.iter().min().unwrap().clone();
+    let ans: u64 = *nx.iter().min().unwrap();
     Some(ans)
 }
 
@@ -52,14 +52,14 @@ pub fn part_two(input: &str) -> Option<u64> {
                 nx.insert((vv[i], vv[i + 1]));
             }
         }
-        else if line.trim().len() == 0{
+        else if line.trim().is_empty(){
             for n in cur{
                 nx.insert(n);
             }
             cur = nx.clone();
             nx = HashSet::<(u64, u64)>::new();
         }
-        else if line.contains(":"){
+        else if line.contains(':'){
 
         }
         else{
@@ -83,7 +83,7 @@ pub fn part_two(input: &str) -> Option<u64> {
     for n in cur{
         nx.insert(n);
     }
-    let ans: u64 = nx.iter().map(| (a, _b)|  a).min().unwrap().clone();
+    let ans: u64 = *nx.iter().map(| (a, _b)|  a).min().unwrap();
     Some(ans)
 }
 

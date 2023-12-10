@@ -4,8 +4,8 @@ advent_of_code::solution!(9);
 pub fn part_one(input: &str) -> Option<i32> {
     let mut vals: Vec<Vec<i32>> = Vec::new();
     let mut ans = 0;
-    for (_i, line) in input.lines().into_iter().enumerate(){
-        if line.trim().len() > 0  {
+    for (_i, line) in input.lines().enumerate(){
+        if !line.trim().is_empty()  {
             vals.push(Vec::new());
             line.split_whitespace().for_each(|x| vals[0].push(x.parse::<i32>().unwrap()));
 
@@ -20,13 +20,13 @@ pub fn part_one(input: &str) -> Option<i32> {
             let n = vals.len();
             vals[n - 1].push(0);
             for i in (0..n-1).rev(){
-                let c1 = vals[i + 1].last().unwrap().clone();
-                let c = vals[i].last().unwrap().clone();
+                let c1 = *vals[i + 1].last().unwrap();
+                let c = *vals[i].last().unwrap();
                 vals[i].push(c + c1);
                 //println!("{} {:?}",i, vals[i]);
             }
             
-            ans += vals[0].last().unwrap().clone();
+            ans += *vals[0].last().unwrap();
             vals.clear();
         }
     }
@@ -36,8 +36,8 @@ pub fn part_one(input: &str) -> Option<i32> {
 pub fn part_two(input: &str) -> Option<i32> {
     let mut vals: Vec<Vec<i32>> = Vec::new();
     let mut ans = 0;
-    for (_i, line) in input.lines().into_iter().enumerate(){
-        if line.trim().len() > 0  {
+    for (_i, line) in input.lines().enumerate(){
+        if !line.trim().is_empty()  {
             vals.push(Vec::new());
             line.split_whitespace().for_each(|x| vals[0].push(x.parse::<i32>().unwrap()));
 

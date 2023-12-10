@@ -8,8 +8,8 @@ pub fn part_one(input: &str) -> Option<u32> {
     let mut mapl = HashMap::new();
     let mut mapr = HashMap::new();
     
-    for (i, line) in input.lines().into_iter().enumerate(){
-        if line.trim().len() > 0  {
+    for (i, line) in input.lines().enumerate(){
+        if !line.trim().is_empty()  {
             if i == 0{
                 for m in line.trim().as_bytes(){
                     if *m == b'L'{
@@ -24,7 +24,7 @@ pub fn part_one(input: &str) -> Option<u32> {
                 let mut v = "";
                 let mut vl = "";
                 let mut vr = "";
-                for (j, c) in line.trim().split_whitespace().enumerate(){
+                for (j, c) in line.split_whitespace().enumerate(){
                     if j == 0{
                         v = c;
                     }
@@ -62,8 +62,8 @@ pub fn part_two(input: &str) -> Option<u64> {
     let mut mapl = HashMap::new();
     let mut mapr = HashMap::new();
     
-    for (i, line) in input.lines().into_iter().enumerate(){
-        if line.trim().len() > 0  {
+    for (i, line) in input.lines().enumerate(){
+        if !line.trim().is_empty()  {
             if i == 0{
                 for m in line.trim().as_bytes(){
                     if *m == b'L'{
@@ -78,7 +78,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                 let mut v = "";
                 let mut vl = "";
                 let mut vr = "";
-                for (j, c) in line.trim().split_whitespace().enumerate(){
+                for (j, c) in line.split_whitespace().enumerate(){
                     if j == 0{
                         v = c;
                     }
@@ -95,18 +95,18 @@ pub fn part_two(input: &str) -> Option<u64> {
             }
         }
     }
-    let cur = mapl.keys().filter(|&x| x.ends_with("A")).collect::<Vec<&&str>>();
+    let cur = mapl.keys().filter(|&x| x.ends_with('A')).collect::<Vec<&&str>>();
     let n = moves.len();
     let mut map2 = HashMap::new();
     let mut vals = Vec::new();
-    for i in 0..cur.len(){
+    for curi in cur{
         let mut t:u64 = 0;
-        let mut ncur = cur[i];
-        let mut ocur = cur[i];
+        let mut ncur = curi;
+        let mut ocur = curi;
         while !map2.contains_key(&(t % n as u64, ocur) ){
             let ot = t;
             
-            while t == ot || !ncur.ends_with("Z"){
+            while t == ot || !ncur.ends_with('Z'){
                 
                 if moves[(t % n as u64) as usize] == 0{
                     ncur = mapl.get(ncur).unwrap();

@@ -11,14 +11,14 @@ pub fn part_one(input: &str) -> Option<u32> {
         let mut cardit = it.next().unwrap().trim().split('|');
         let mut good = HashSet::new();
         for n in cardit.next().unwrap().trim().split(' ') {
-            if n.trim().len() == 0{
+            if n.trim().is_empty(){
                 continue;
             }
             good.insert(n.trim().parse::<u32>().unwrap());
         }
         let mut cur = 0;
         for n in cardit.next().unwrap().trim().split(' ') {
-            if n.trim().len() == 0{
+            if n.trim().is_empty(){
                 continue;
             }
             if good.contains(&n.trim().parse::<u32>().unwrap()){
@@ -49,7 +49,7 @@ pub fn part_two(input: &str) -> Option<u32> {
         let mut cardit = it.next().unwrap().trim().split('|');
         let mut good = HashSet::new();
         for n in cardit.next().unwrap().trim().split(' ') {
-            if n.trim().len() == 0{
+            if n.trim().is_empty(){
                 continue;
             }
             good.insert(n.trim().parse::<u32>().unwrap());
@@ -57,7 +57,7 @@ pub fn part_two(input: &str) -> Option<u32> {
         let mut cur = 0;
         let mut m = 0;
         for n in cardit.next().unwrap().trim().split(' ') {
-            if n.trim().len() == 0{
+            if n.trim().is_empty(){
                 continue;
             }
             if good.contains(&n.trim().parse::<u32>().unwrap()){

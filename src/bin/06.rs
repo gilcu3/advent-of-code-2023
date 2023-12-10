@@ -102,7 +102,7 @@ pub fn part_two(input: &str) -> Option<u64> {
         }
     }
     let high = a;
-    let ans = (high - low + 1) as u64;
+    let ans = high - low + 1;
     Some(ans)
 }
 
