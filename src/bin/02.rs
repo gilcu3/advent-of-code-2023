@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 advent_of_code::solution!(2);
 
-
 fn parse_game_data(data: String) -> Vec<(u32, Vec<HashMap<String, u32>>)> {
     let mut games = Vec::new();
 
@@ -36,13 +35,11 @@ fn parse_game_data(data: String) -> Vec<(u32, Vec<HashMap<String, u32>>)> {
     games
 }
 
-
 pub fn part_one(input: &str) -> Option<u32> {
     let games = parse_game_data(input.to_string());
     let mx = HashMap::from([("blue", 14), ("green", 13), ("red", 12)]);
     let mut ans: u32 = 0;
     for (gameid, rounds) in games {
-        
         let mut possible: bool = true;
         for round in rounds {
             for (color, count) in round {
@@ -52,7 +49,7 @@ pub fn part_one(input: &str) -> Option<u32> {
                 }
             }
         }
-        if possible{
+        if possible {
             ans += gameid;
         }
     }
@@ -63,8 +60,11 @@ pub fn part_two(input: &str) -> Option<u32> {
     let games = parse_game_data(input.to_string());
     let mut ans: u32 = 0;
     for (_gameid, rounds) in games {
-        
-        let mut mx = HashMap::from([("blue".to_string(), 0), ("green".to_string(), 0), ("red".to_string(), 0)]);
+        let mut mx = HashMap::from([
+            ("blue".to_string(), 0),
+            ("green".to_string(), 0),
+            ("red".to_string(), 0),
+        ]);
         for round in rounds {
             for (color, count) in round {
                 if count > *mx.get(&color).unwrap() {

@@ -2,13 +2,13 @@ advent_of_code::solution!(1);
 
 pub fn part_one(input: &str) -> Option<u32> {
     let mut ans: u32 = 0;
-    for line in input.lines(){
+    for line in input.lines() {
         let mut first: bool = false;
         let mut cur: u32 = 0;
         for c in line.chars() {
             // print char
             if c.is_ascii_digit() {
-                if !first{
+                if !first {
                     cur += 10 * c.to_digit(10).unwrap();
                     first = true;
                 }
@@ -22,21 +22,22 @@ pub fn part_one(input: &str) -> Option<u32> {
 
 pub fn part_two(input: &str) -> Option<u32> {
     let mut ans: u32 = 0;
-    let digits = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
-    for line in input.lines(){
+    let digits = [
+        "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+    ];
+    for line in input.lines() {
         let mut first: bool = false;
         let mut cur: u32 = 0;
 
         for i in 0..line.len() {
             let c = line.chars().nth(i).unwrap();
             if c.is_ascii_digit() {
-                if !first{
+                if !first {
                     cur += 10 * c.to_digit(10).unwrap();
                     first = true;
                 }
                 cur = cur / 10 * 10 + c.to_digit(10).unwrap();
-            }
-            else if c.is_alphabetic() {
+            } else if c.is_alphabetic() {
                 let mut d: u32 = 0;
                 for (k, dig) in digits.iter().enumerate() {
                     if line[i..].starts_with(dig) {
@@ -45,7 +46,7 @@ pub fn part_two(input: &str) -> Option<u32> {
                     }
                 }
                 if d != 0 {
-                    if !first{
+                    if !first {
                         cur += 10 * d;
                         first = true;
                     }
