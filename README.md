@@ -32,25 +32,26 @@ Solutions for [Advent of Code](https://adventofcode.com/) in [Rust](https://www.
 
 | Day | Part 1 | Part 2 |
 | :---: | :---: | :---:  |
-| [Day 1](./src/bin/01.rs) | `86.3µs` | `509.3µs` |
-| [Day 2](./src/bin/02.rs) | `274.4µs` | `311.5µs` |
-| [Day 3](./src/bin/03.rs) | `150.8µs` | `1.1ms` |
-| [Day 4](./src/bin/04.rs) | `446.9µs` | `391.6µs` |
-| [Day 5](./src/bin/05.rs) | `80.7µs` | `130.1µs` |
-| [Day 6](./src/bin/06.rs) | `898.0ns` | `1.3µs` |
-| [Day 7](./src/bin/07.rs) | `3.8ms` | `3.4ms` |
-| [Day 8](./src/bin/08.rs) | `801.8µs` | `6.4ms` |
-| [Day 9](./src/bin/09.rs) | `583.4µs` | `517.2µs` |
-| [Day 10](./src/bin/10.rs) | `3.4ms` | `4.8ms` |
-| [Day 11](./src/bin/11.rs) | `2.2ms` | `2.8ms` |
-| [Day 12](./src/bin/12.rs) | `3.4ms` | `90.8ms` |
-| [Day 13](./src/bin/13.rs) | `296.8µs` | `15.4ms` |
-| [Day 14](./src/bin/14.rs) | `125.8µs` | `75.4ms` |
-| [Day 15](./src/bin/15.rs) | `171.6µs` | `486.7µs` |
-| [Day 16](./src/bin/16.rs) | `1.2ms` | `66.9ms` |
-| [Day 17](./src/bin/17.rs) | `9.3ms` | `17.4ms` |
+| [Day 1](./src/bin/01.rs) | `62.5µs` | `472.1µs` |
+| [Day 2](./src/bin/02.rs) | `202.4µs` | `248.4µs` |
+| [Day 3](./src/bin/03.rs) | `107.5µs` | `902.1µs` |
+| [Day 4](./src/bin/04.rs) | `338.9µs` | `321.2µs` |
+| [Day 5](./src/bin/05.rs) | `59.0µs` | `126.3µs` |
+| [Day 6](./src/bin/06.rs) | `377.0ns` | `548.0ns` |
+| [Day 7](./src/bin/07.rs) | `3.2ms` | `2.7ms` |
+| [Day 8](./src/bin/08.rs) | `620.8µs` | `6.0ms` |
+| [Day 9](./src/bin/09.rs) | `506.8µs` | `403.3µs` |
+| [Day 10](./src/bin/10.rs) | `2.7ms` | `3.5ms` |
+| [Day 11](./src/bin/11.rs) | `1.5ms` | `2.1ms` |
+| [Day 12](./src/bin/12.rs) | `2.9ms` | `72.5ms` |
+| [Day 13](./src/bin/13.rs) | `224.8µs` | `13.0ms` |
+| [Day 14](./src/bin/14.rs) | `86.8µs` | `59.4ms` |
+| [Day 15](./src/bin/15.rs) | `130.7µs` | `420.5µs` |
+| [Day 16](./src/bin/16.rs) | `877.7µs` | `58.3ms` |
+| [Day 17](./src/bin/17.rs) | `7.3ms` | `12.9ms` |
+| [Day 18](./src/bin/18.rs) | `832.7µs` | `2.5s` |
 
-**Total: 313.07ms**
+**Total: 2754.95ms**
 <!--- benchmarking table --->
 
 ---
