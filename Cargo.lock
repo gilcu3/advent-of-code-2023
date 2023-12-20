@@ -12,6 +12,7 @@ dependencies = [
  "num_enum",
  "pico-args",
  "regex",
+ "ring-algorithm",
 ]
 
 [[package]]
@@ -231,6 +232,15 @@ name = "regex-syntax"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c08c74e62047bb2de4ff487b251e4a92e24f48745648451635cec7d591162d9f"
+
+[[package]]
+name = "ring-algorithm"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "88c06cb9c53ee681ce4b0bde27ff7179dd57f3a88baa259c4772ae279c395d59"
+dependencies = [
+ "num-traits",
+]
 
 [[package]]
 name = "syn"
