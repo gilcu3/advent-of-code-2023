@@ -99,7 +99,7 @@ pub fn part_one(input: &str) -> Option<u32> {
     Some(ans)
 }
 
-pub fn part_two(input: &str) -> Option<u64> {
+pub fn part_two_slow(input: &str) -> Option<u64> {
     let dirs: [(isize, isize); 4] = [(0, 1), (1, 0), (0, -1), (-1, 0)];
     let mut moves = vec![];
     let (mut mx, mut nx, mut my, mut ny) = (0, 0, 0, 0);
@@ -173,6 +173,35 @@ pub fn part_two(input: &str) -> Option<u64> {
         }
     }
 
+    Some(ans)
+}
+
+fn area(vertices: &[(i64, i64)]) -> i64 {
+    let mut ans = 0;
+    let n = vertices.len();
+    for i in 0..n {
+        ans += vertices[i].0 * vertices[(i + 1) % n].1 - vertices[(i + 1) % n].0 * vertices[i].1;
+    }
+    ans
+}
+
+pub fn part_two(input: &str) -> Option<u64> {
+    let dirs: [(isize, isize); 4] = [(0, 1), (1, 0), (0, -1), (-1, 0)];
+    let mut vertices = vec![];
+    let (mut x, mut y) = (0, 0);
+    let mut per = 0;
+    for line in input.lines() {
+        if !line.trim().is_empty() {
+            let ds = line.split_whitespace().nth(2).unwrap();
+            let s = i32::from_str_radix(&ds[2..7], 16).unwrap();
+            let d = ds[7..8].parse::<usize>().unwrap();
+            x += (dirs[d].0 as i32) * s;
+            y += (dirs[d].1 as i32) * s;
+            per += s;
+            vertices.push((x as i64, y as i64));
+        }
+    }
+    let ans = area(&vertices).unsigned_abs() / 2 + (per / 2) as u64 + 1;
     Some(ans)
 }
 

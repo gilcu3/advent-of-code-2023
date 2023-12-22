@@ -1,4 +1,4 @@
-//use std::collections::HashMap;
+use std::collections::HashMap;
 
 advent_of_code::solution!(21);
 
@@ -83,42 +83,56 @@ fn compute_distance(sv: Vec<(usize, usize)>, dsv: Vec<u32>, mat: &Vec<Vec<u32>>)
     dis
 }
 
-// fn brute(sx: usize, sy: usize, mat: &Vec<Vec<u32>>, steps: u32) -> (HashMap<(i32, i32), u64>, u64){
-//     let n = mat.len();
-//     let mut dis = HashMap::new();
-//     let mut que = vec![];
-//     let mut ans = 0;
-//     dis.insert((sx as i32, sy as i32), 0);
-//     que.push((sx as i32, sy as i32));
-//     let mut sq = HashMap::new();
+pub fn brute(
+    sx: usize,
+    sy: usize,
+    mat: &Vec<Vec<u32>>,
+    steps: u32,
+) -> (HashMap<(i32, i32), u64>, u64) {
+    let n = mat.len();
+    let mut dis = HashMap::new();
+    let mut que = vec![];
+    let mut ans = 0;
+    dis.insert((sx as i32, sy as i32), 0);
+    que.push((sx as i32, sy as i32));
+    let mut sq = HashMap::new();
 
-//     let mut front = 0;
-//     while front < que.len() {
-//         let (x, y) = que[front];
-//         front += 1;
-//         if dis[&(x, y)] % 2 == steps % 2 {
-//             let (xx, yy) = (if x >= 0 {x / n as i32} else {-((-x - 1) / n as i32) - 1}, if y >= 0 {y / n as i32} else {-((-y - 1) / n as i32) - 1});
-//             sq.insert((xx, yy), sq.get(&(xx, yy)).unwrap_or(&0) + 1);
-//             ans += 1;
-//         }
-//         if dis[&(x, y)] == steps {
-//             continue;
-//         }
-//         for (dx, dy) in [(1, 0), (0, -1), (-1, 0), (0, 1)].iter() {
-//             let (nx, ny) = (x + dx, y + dy);
-//             let mn = n as i32;
-//             let (kx, ky) = ((nx % mn + mn) % mn, (ny % mn + mn ) % mn);
-//             if mat[kx as usize][ky as usize] == 0
-//                 && !dis.contains_key(&(nx, ny))
-//             {
-//                 dis.insert((nx, ny), dis[&(x, y)] + 1);
-//                 que.push((nx, ny));
-//             }
-//         }
-//     }
-//     //println!("sq: {:?}", sq);
-//     (sq, ans)
-// }
+    let mut front = 0;
+    while front < que.len() {
+        let (x, y) = que[front];
+        front += 1;
+        if dis[&(x, y)] % 2 == steps % 2 {
+            let (xx, yy) = (
+                if x >= 0 {
+                    x / n as i32
+                } else {
+                    -((-x - 1) / n as i32) - 1
+                },
+                if y >= 0 {
+                    y / n as i32
+                } else {
+                    -((-y - 1) / n as i32) - 1
+                },
+            );
+            sq.insert((xx, yy), sq.get(&(xx, yy)).unwrap_or(&0) + 1);
+            ans += 1;
+        }
+        if dis[&(x, y)] == steps {
+            continue;
+        }
+        for (dx, dy) in [(1, 0), (0, -1), (-1, 0), (0, 1)].iter() {
+            let (nx, ny) = (x + dx, y + dy);
+            let mn = n as i32;
+            let (kx, ky) = ((nx % mn + mn) % mn, (ny % mn + mn) % mn);
+            if mat[kx as usize][ky as usize] == 0 && !dis.contains_key(&(nx, ny)) {
+                dis.insert((nx, ny), dis[&(x, y)] + 1);
+                que.push((nx, ny));
+            }
+        }
+    }
+    //println!("sq: {:?}", sq);
+    (sq, ans)
+}
 
 pub fn solve_part_two(input: &str, steps: u32) -> Option<u64> {
     //let steps = 26501365;
@@ -174,7 +188,7 @@ pub fn solve_part_two(input: &str, steps: u32) -> Option<u64> {
     // same row or column
     for d1 in 0..2 {
         let mut dl = vec![vec![0; n]; n];
-        let mut mx = 0;
+        //let mut mx = 260;
         for (i, dli) in dl.iter_mut().enumerate() {
             let tmp = compute_distance(vec![if d1 == 0 { (i, 0) } else { (0, i) }], vec![0], &mat);
             for j in 0..n {
@@ -184,26 +198,27 @@ pub fn solve_part_two(input: &str, steps: u32) -> Option<u64> {
                     tmp[n - 1][j]
                 };
             }
-            for tx in tmp.iter() {
-                for ty in tx.iter() {
-                    if *ty != std::u32::MAX {
-                        mx = mx.max(*ty)
-                    }
-                }
-            }
-            let tmp = compute_distance(
-                vec![if d1 == 0 { (i, n - 1) } else { (n - 1, i) }],
-                vec![0],
-                &mat,
-            );
-            for tx in tmp.iter() {
-                for ty in tx.iter() {
-                    if *ty != std::u32::MAX {
-                        mx = mx.max(*ty)
-                    }
-                }
-            }
+            // for tx in tmp.iter() {
+            //     for ty in tx.iter() {
+            //         if *ty != std::u32::MAX {
+            //             mx = mx.max(*ty)
+            //         }
+            //     }
+            // }
+            // let tmp = compute_distance(
+            //     vec![if d1 == 0 { (i, n - 1) } else { (n - 1, i) }],
+            //     vec![0],
+            //     &mat,
+            // );
+            // for tx in tmp.iter() {
+            //     for ty in tx.iter() {
+            //         if *ty != std::u32::MAX {
+            //             mx = mx.max(*ty)
+            //         }
+            //     }
+            // }
         }
+        
         //println!("mx: {}", mx);
         let top = steps / n as u32;
         for d2 in 0..2 {
@@ -211,6 +226,8 @@ pub fn solve_part_two(input: &str, steps: u32) -> Option<u64> {
             for i in 0..n {
                 d0[i] = dcenter[ind[d1][1 - d2][i].0][ind[d1][1 - d2][i].1] + 1;
             }
+            let tmp = compute_distance(ind[d1][d2].clone(), vec![0; n], &mat);
+            let mx = *tmp.iter().map(|x| x.iter().filter(|x| **x != std::u32::MAX).max().unwrap()).max().unwrap();
 
             for s in 0..top + 1 {
                 //if d1 == 0 && d2 == 0 {println!("d0: {:?}", d0)}
