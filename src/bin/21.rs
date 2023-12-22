@@ -120,8 +120,8 @@ fn compute_distance(sv: Vec<(usize, usize)>, dsv: Vec<u32>, mat: &Vec<Vec<u32>>)
 //     (sq, ans)
 // }
 
-pub fn part_two(input: &str) -> Option<u64> {
-    let steps = 26501365;
+pub fn solve_part_two(input: &str, steps: u32) -> Option<u64> {
+    //let steps = 26501365;
     // let steps = 6; // 16
     // let steps = 10; // 50
     // //let steps = 1231; // 50
@@ -358,6 +358,9 @@ pub fn part_two(input: &str) -> Option<u64> {
     Some(ans)
 }
 
+pub fn part_two(input: &str) -> Option<u64> {
+    solve_part_two(input, 26501365)
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -370,7 +373,21 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, Some(16733044));
+        let data = [
+            (6, 16),
+            (10, 50),
+            (50, 1594),
+            (100, 6536),
+            (500, 167004),
+            (1000, 668697),
+            (5000, 16733044),
+        ];
+        for (steps, ans) in data.iter() {
+            let result = solve_part_two(
+                &advent_of_code::template::read_file("examples", DAY),
+                *steps,
+            );
+            assert_eq!(result, Some(*ans));
+        }
     }
 }
