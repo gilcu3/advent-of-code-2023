@@ -218,7 +218,7 @@ pub fn solve_part_two(input: &str, steps: u32) -> Option<u64> {
             //     }
             // }
         }
-        
+
         //println!("mx: {}", mx);
         let top = steps / n as u32;
         for d2 in 0..2 {
@@ -227,7 +227,11 @@ pub fn solve_part_two(input: &str, steps: u32) -> Option<u64> {
                 d0[i] = dcenter[ind[d1][1 - d2][i].0][ind[d1][1 - d2][i].1] + 1;
             }
             let tmp = compute_distance(ind[d1][d2].clone(), vec![0; n], &mat);
-            let mx = *tmp.iter().map(|x| x.iter().filter(|x| **x != std::u32::MAX).max().unwrap()).max().unwrap();
+            let mx = *tmp
+                .iter()
+                .map(|x| x.iter().filter(|x| **x != std::u32::MAX).max().unwrap())
+                .max()
+                .unwrap();
 
             for s in 0..top + 1 {
                 //if d1 == 0 && d2 == 0 {println!("d0: {:?}", d0)}
