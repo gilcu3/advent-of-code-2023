@@ -76,13 +76,32 @@ pub fn part_one(input: &str) -> Option<u32> {
     Some(ans as u32)
 }
 
-fn dfs2(graph: &Vec<Vec<(usize, usize)>>, cv: usize, ev: usize, seen: &mut Vec<bool>) -> isize {
+fn dfs2(
+    graph: &Vec<Vec<(usize, usize)>>,
+    cv: usize,
+    ev: usize,
+    seen: &mut Vec<bool>,
+    cur: usize,
+    best: &mut usize,
+    trem: &mut usize,
+) -> isize {
+    if *trem + cur <= *best {
+        return -1;
+    }
     let mut ans = -1;
     seen[cv] = true;
     if cv != ev {
+        let mut crem = 0;
         for &(nv, nw) in &graph[cv] {
             if !seen[nv] {
-                let cur = dfs2(graph, nv, ev, seen);
+                crem += nw;
+            }
+        }
+        *trem -= crem;
+        for &(nv, nw) in &graph[cv] {
+            if !seen[nv] {
+                let cur = dfs2(graph, nv, ev, seen, cur + nw, best, trem);
+
                 if cur != -1 {
                     if ans == -1 {
                         ans = cur + nw as isize;
@@ -92,7 +111,9 @@ fn dfs2(graph: &Vec<Vec<(usize, usize)>>, cv: usize, ev: usize, seen: &mut Vec<b
                 }
             }
         }
+        *trem += crem;
     } else {
+        *best = *best.max(&mut cur.clone());
         ans = 0
     }
     seen[cv] = false;
@@ -201,12 +222,21 @@ pub fn part_two(input: &str) -> Option<u32> {
     }
 
     let mut graph2 = vec![vec![]; idx2];
+    let mut trem = 0;
     for (i, j, v) in edges {
         graph2[i].push((j, v));
+        trem += v;
     }
-    //println!("{:?}", graph2);
-
-    let ans = dfs2(&graph2, hh[&1], hh[&(idx - 1)], &mut vec![false; idx2]);
+    trem /= 2;
+    let ans = dfs2(
+        &graph2,
+        hh[&1],
+        hh[&(idx - 1)],
+        &mut vec![false; idx2],
+        0,
+        &mut 0,
+        &mut trem,
+    );
     Some(ans as u32)
 }
 
