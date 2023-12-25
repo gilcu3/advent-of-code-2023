@@ -135,15 +135,6 @@ pub fn brute(
 }
 
 pub fn solve_part_two(input: &str, steps: u32) -> Option<u64> {
-    //let steps = 26501365;
-    // let steps = 6; // 16
-    // let steps = 10; // 50
-    // //let steps = 1231; // 50
-    //let steps = 50; // 1594
-    //let steps = 100; // 6536
-    //let steps = 500; // 167004
-    //let steps = 1000; // 668697
-    //let steps = 5000; // 16733044
     let mut mat = vec![];
     let (mut sx, mut sy) = (0, 0);
     for line in input.lines() {
@@ -187,37 +178,40 @@ pub fn solve_part_two(input: &str, steps: u32) -> Option<u64> {
     }
     // same row or column
     for d1 in 0..2 {
-        let mut dl = vec![vec![0; n]; n];
+        
+        // this was  part of the general solution that is not the most optimal
+        
+        //let mut dl = vec![vec![0; n]; n];
         //let mut mx = 260;
-        for (i, dli) in dl.iter_mut().enumerate() {
-            let tmp = compute_distance(vec![if d1 == 0 { (i, 0) } else { (0, i) }], vec![0], &mat);
-            for j in 0..n {
-                dli[j] = if d1 == 0 {
-                    tmp[j][n - 1]
-                } else {
-                    tmp[n - 1][j]
-                };
-            }
-            // for tx in tmp.iter() {
-            //     for ty in tx.iter() {
-            //         if *ty != std::u32::MAX {
-            //             mx = mx.max(*ty)
-            //         }
-            //     }
-            // }
-            // let tmp = compute_distance(
-            //     vec![if d1 == 0 { (i, n - 1) } else { (n - 1, i) }],
-            //     vec![0],
-            //     &mat,
-            // );
-            // for tx in tmp.iter() {
-            //     for ty in tx.iter() {
-            //         if *ty != std::u32::MAX {
-            //             mx = mx.max(*ty)
-            //         }
-            //     }
-            // }
-        }
+        // for (i, dli) in dl.iter_mut().enumerate() {
+        //     let tmp = compute_distance(vec![if d1 == 0 { (i, 0) } else { (0, i) }], vec![0], &mat);
+        //     for j in 0..n {
+        //         dli[j] = if d1 == 0 {
+        //             tmp[j][n - 1]
+        //         } else {
+        //             tmp[n - 1][j]
+        //         };
+        //     }
+        //     // for tx in tmp.iter() {
+        //     //     for ty in tx.iter() {
+        //     //         if *ty != std::u32::MAX {
+        //     //             mx = mx.max(*ty)
+        //     //         }
+        //     //     }
+        //     // }
+        //     // let tmp = compute_distance(
+        //     //     vec![if d1 == 0 { (i, n - 1) } else { (n - 1, i) }],
+        //     //     vec![0],
+        //     //     &mat,
+        //     // );
+        //     // for tx in tmp.iter() {
+        //     //     for ty in tx.iter() {
+        //     //         if *ty != std::u32::MAX {
+        //     //             mx = mx.max(*ty)
+        //     //         }
+        //     //     }
+        //     // }
+        // }
 
         //println!("mx: {}", mx);
         let top = steps / n as u32;
@@ -263,14 +257,28 @@ pub fn solve_part_two(input: &str, steps: u32) -> Option<u64> {
                     }
                 }
                 // this seems to hold in general, for some constant
-                if s < 10 {
-                    let mut tmp = vec![std::u32::MAX; n];
-                    for (i, ti) in tmp.iter_mut().enumerate() {
-                        for i0 in 0..n {
-                            *ti = (*ti).min(d0[i0] + dl[i0][i] + 1);
-                        }
+                if s < 3 {
+
+                    // this was part of the general solution that is not the most optimal
+                    // let mut tmp = vec![std::u32::MAX; n];
+                    
+                    // for (i, ti) in tmp.iter_mut().enumerate() {
+                    //     for i0 in 0..n {
+                    //         *ti = (*ti).min(d0[i0] + dl[i0][i] + 1);
+                    //     }
+                    // }
+                    // d0 = tmp;
+
+
+                    let tmp = compute_distance(ind[d1][d2].clone(), d0.clone(), &mat);
+                    for j in 0..n{
+                        d0[j] = if d1 == 0 {
+                            tmp[j][if d2 == 0 {n - 1}else {0}]
+                        } else {
+                            tmp[if d2 == 0 {n - 1}else {0}][j]
+                        } + 1;
                     }
-                    d0 = tmp;
+
                 } else {
                     for d0i in d0.iter_mut() {
                         *d0i += n as u32;
@@ -278,13 +286,14 @@ pub fn solve_part_two(input: &str, steps: u32) -> Option<u64> {
                 }
             }
 
-            if d2 == 0 {
-                for i in 0..n {
-                    for j in 0..i {
-                        (dl[i][j], dl[j][i]) = (dl[j][i], dl[i][j]);
-                    }
-                }
-            }
+            // this was part of the general solution that is not the most optimal
+            // if d2 == 0 {
+            //     for i in 0..n {
+            //         for j in 0..i {
+            //             (dl[i][j], dl[j][i]) = (dl[j][i], dl[i][j]);
+            //         }
+            //     }
+            // }
         }
     }
     for x in 0..2 {
