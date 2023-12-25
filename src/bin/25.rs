@@ -26,10 +26,9 @@ fn mincut(g: &mut Vec<Vec<u32>>, target: u32) -> usize {
         }
     }
     'outer: for ph in 0..n - 1 {
-        
         let mut que = BinaryHeap::new();
-        
-        for i in 0..n  {
+
+        for i in 0..n {
             if exist[i] {
                 w[i] = 0;
                 in_a[i] = false;

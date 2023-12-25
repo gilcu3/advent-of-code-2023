@@ -178,9 +178,8 @@ pub fn solve_part_two(input: &str, steps: u32) -> Option<u64> {
     }
     // same row or column
     for d1 in 0..2 {
-        
         // this was  part of the general solution that is not the most optimal
-        
+
         //let mut dl = vec![vec![0; n]; n];
         //let mut mx = 260;
         // for (i, dli) in dl.iter_mut().enumerate() {
@@ -258,10 +257,9 @@ pub fn solve_part_two(input: &str, steps: u32) -> Option<u64> {
                 }
                 // this seems to hold in general, for some constant
                 if s < 3 {
-
                     // this was part of the general solution that is not the most optimal
                     // let mut tmp = vec![std::u32::MAX; n];
-                    
+
                     // for (i, ti) in tmp.iter_mut().enumerate() {
                     //     for i0 in 0..n {
                     //         *ti = (*ti).min(d0[i0] + dl[i0][i] + 1);
@@ -269,16 +267,14 @@ pub fn solve_part_two(input: &str, steps: u32) -> Option<u64> {
                     // }
                     // d0 = tmp;
 
-
                     let tmp = compute_distance(ind[d1][d2].clone(), d0.clone(), &mat);
-                    for j in 0..n{
+                    for j in 0..n {
                         d0[j] = if d1 == 0 {
-                            tmp[j][if d2 == 0 {n - 1}else {0}]
+                            tmp[j][if d2 == 0 { n - 1 } else { 0 }]
                         } else {
-                            tmp[if d2 == 0 {n - 1}else {0}][j]
+                            tmp[if d2 == 0 { n - 1 } else { 0 }][j]
                         } + 1;
                     }
-
                 } else {
                     for d0i in d0.iter_mut() {
                         *d0i += n as u32;
