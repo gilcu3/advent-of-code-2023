@@ -3,7 +3,7 @@ advent_of_code::solution!(25);
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
 
-fn mincut(g: &mut Vec<Vec<u32>>) -> (u32, Vec<usize>) {
+fn mincut(g: &mut Vec<Vec<u32>>, target: u32) -> usize {
     let n = g.len();
     let mut best_cost = u32::MAX;
     let mut best_cut: Vec<usize> = Vec::new();
@@ -16,7 +16,7 @@ fn mincut(g: &mut Vec<Vec<u32>>) -> (u32, Vec<usize>) {
     let mut w: Vec<u32> = vec![0; n];
     let mut exist: Vec<bool> = vec![true; n];
     let mut in_a: Vec<bool> = vec![false; n];
-    let mut gg = vec![vec![]; n];
+    let mut gg = vec![Vec::with_capacity(n); n];
     for i in 0..n {
         for j in 0..n {
             if g[i][j] == 1 {
@@ -25,18 +25,19 @@ fn mincut(g: &mut Vec<Vec<u32>>) -> (u32, Vec<usize>) {
             }
         }
     }
-
-    for ph in 0..n - 1 {
-        in_a.fill(false);
-        w.fill(0);
-        let mut prev = 0;
+    'outer: for ph in 0..n - 1 {
+        
         let mut que = BinaryHeap::new();
-
-        for i in 0..n {
+        
+        for i in 0..n  {
             if exist[i] {
+                w[i] = 0;
+                in_a[i] = false;
                 que.push((w[i], i));
             }
         }
+
+        let mut prev = 0;
 
         for it in 0..n - ph {
             let sel;
@@ -47,14 +48,15 @@ fn mincut(g: &mut Vec<Vec<u32>>) -> (u32, Vec<usize>) {
                     break;
                 }
             }
-
             if it == n - ph - 1 {
                 if w[sel] < best_cost {
                     best_cost = w[sel];
                     best_cut = v[sel].clone();
+                    if best_cost == 2 * target {
+                        break 'outer;
+                    }
                 }
-
-                for i in 0..n {
+                for &i in gg[sel].clone().iter() {
                     if exist[i] {
                         if g[prev][i] == 0 && g[sel][i] > 0 {
                             gg[prev].push(i);
@@ -69,18 +71,17 @@ fn mincut(g: &mut Vec<Vec<u32>>) -> (u32, Vec<usize>) {
                 exist[sel] = false;
             } else {
                 in_a[sel] = true;
-                for i in gg[sel].iter() {
-                    if g[sel][*i] > 0 && exist[*i] && !in_a[*i] {
-                        w[*i] += g[sel][*i];
-                        que.push((w[*i], *i));
+                for &i in gg[sel].iter() {
+                    if g[sel][i] > 0 && exist[i] && !in_a[i] {
+                        w[i] += g[sel][i];
+                        que.push((w[i], i));
                     }
                 }
                 prev = sel;
             }
         }
     }
-
-    (best_cost, best_cut)
+    best_cut.len()
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
@@ -107,17 +108,13 @@ pub fn part_one(input: &str) -> Option<u32> {
         g[u][v] = 1;
         g[v][u] = 1;
     }
-    let (_cost, cut) = mincut(&mut g);
-    // println!("{:?}", hh);
-    // println!("n: {}, m: {}", n, m);
-    // println!("cost: {}", cost);
-    // println!("cut: {:?}", cut);
-    let ans = cut.len() * (n - cut.len());
+    let cut = mincut(&mut g, 3);
+    let ans = cut * (n - cut);
     Some(ans as u32)
 }
 
 pub fn part_two(_input: &str) -> Option<u32> {
-    Some(0)
+    None
 }
 
 #[cfg(test)]
@@ -133,6 +130,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, Some(0));
+        assert_eq!(result, None);
     }
 }
